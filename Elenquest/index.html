@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Особенный вопрос ❤️</title>
+    
+    <!-- Google Fonts: Comfortaa & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #ffeef2 0%, #fff0f5 50%, #fed7e2 100%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 255, 255, 0.9);
+            --shadow-soft: 0 20px 40px rgba(225, 112, 133, 0.15), 0 6px 16px rgba(0, 0, 0, 0.04);
+            
+            --color-yes: #10b981;
+            --color-yes-hover: #059669;
+            --color-yes-shadow: rgba(16, 185, 129, 0.35);
+
+            --color-no: #f43f5e;
+            --color-no-hover: #e11d48;
+            --color-no-shadow: rgba(244, 63, 94, 0.35);
+
+            --text-main: #334155;
+            --text-heading: #1e293b;
+            --font-heading: 'Comfortaa', cursive, sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-gradient);
+            font-family: var(--font-body);
+            color: var(--text-main);
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Фоновые мягкие плавающие круги для атмосферы */
+        .decor-circle {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.45;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .decor-1 {
+            width: 320px;
+            height: 320px;
+            background: #fbcfe8;
+            top: -60px;
+            left: -60px;
+        }
+
+        .decor-2 {
+            width: 360px;
+            height: 360px;
+            background: #fed7aa;
+            bottom: -80px;
+            right: -80px;
+        }
+
+        /* Canvas для сердечек-конфетти при согласии */
+        #celebration-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        /* Главная карточка */
+        .card-container {
+            position: relative;
+            z-index: 10;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px solid var(--card-border);
+            border-radius: 28px;
+            box-shadow: var(--shadow-soft);
+            padding: 40px 32px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            transition: all 0.4s ease;
+            animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Заголовок */
+        .title {
+            font-family: var(--font-heading);
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            line-height: 1.35;
+            margin-bottom: 22px;
+            letter-spacing: -0.02em;
+        }
+
+        /* Контейнер гифки */
+        .gif-wrapper {
+            width: 100%;
+            max-width: 260px;
+            height: 220px;
+            margin: 0 auto 28px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(225, 112, 133, 0.15);
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gif-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .gif-wrapper img:hover {
+            transform: scale(1.03);
+        }
+
+        /* Зона кнопок */
+        .buttons-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            min-height: 56px;
+        }
+
+        /* Стили кнопок */
+        .btn {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 700;
+            padding: 14px 38px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            user-select: none;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Зеленая кнопка "Да" */
+        .btn-yes {
+            background-color: var(--color-yes);
+            color: #ffffff;
+            box-shadow: 0 10px 24px var(--color-yes-shadow);
+        }
+
+        .btn-yes:hover {
+            background-color: var(--color-yes-hover);
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 14px 28px var(--color-yes-shadow);
+        }
+
+        .btn-yes:active {
+            transform: scale(0.98);
+        }
+
+        /* Красная кнопка "Нет" */
+        .btn-no {
+            background-color: var(--color-no);
+            color: #ffffff;
+            box-shadow: 0 10px 24px var(--color-no-shadow);
+            z-index: 100;
+            /* Плавная анимация перемещения при бегстве */
+            transition: left 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+                        top 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.2s ease;
+        }
+
+        .btn-no:hover {
+            background-color: var(--color-no-hover);
+        }
+
+        /* Класс, который вешается при первом "побеге" кнопки */
+        .btn-no.escaped {
+            position: fixed !important;
+            margin: 0 !important;
+            z-index: 999999 !important;
+            touch-action: none;
+            box-shadow: 0 10px 25px rgba(244, 63, 94, 0.45);
+            transition: left 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+                        top 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        /* Выпадающие при отказе стикеры */
+        .sticker-item {
+            position: fixed;
+            z-index: 15;
+            pointer-events: none;
+            user-select: none;
+            width: 120px;
+            max-width: 28vw;
+            height: auto;
+            filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.18));
+            animation: stickerAppear 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            will-change: transform, opacity;
+            transition: opacity 0.5s ease;
+        }
+
+        @keyframes stickerAppear {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.15) rotate(var(--rot-start));
+            }
+            70% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.15) rotate(var(--rot-mid));
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) rotate(var(--rot-end));
+            }
+        }
+
+        /* Финальное радостное состояние */
+        .success-screen {
+            display: none;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .success-screen.active {
+            display: block;
+        }
+
+        .success-title {
+            font-family: var(--font-heading);
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #e11d48;
+            margin-bottom: 20px;
+            animation: pulse 1.8s infinite ease-in-out;
+        }
+
+        .success-subtitle {
+            font-size: 1.1rem;
+            color: #475569;
+            margin-top: 14px;
+            font-weight: 500;
+        }
+
+        /* Праздничные стикеры 10 и 11 */
+        .final-stickers-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 22px;
+        }
+
+        .final-sticker {
+            width: 105px;
+            max-width: 32vw;
+            height: auto;
+            filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.16));
+            animation: finalStickerPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+                       floatSticker 3s ease-in-out infinite alternate;
+        }
+
+        .final-sticker-left {
+            animation-delay: 0.1s, 0.6s;
+        }
+
+        .final-sticker-right {
+            animation-delay: 0.25s, 1s;
+        }
+
+        @keyframes finalStickerPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.2) rotate(-15deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes floatSticker {
+            0% {
+                transform: translateY(0) rotate(-4deg);
+            }
+            100% {
+                transform: translateY(-8px) rotate(4deg);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Адаптивность для мобильных телефонов */
+        @media (max-width: 480px) {
+            .card-container {
+                padding: 30px 20px;
+                border-radius: 24px;
+            }
+
+            .title {
+                font-size: 1.55rem;
+                margin-bottom: 18px;
+            }
+
+            .gif-wrapper {
+                max-width: 220px;
+                height: 190px;
+                margin-bottom: 22px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 1.05rem;
+            }
+
+            .success-title {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Декоративные мягкие круги -->
+    <div class="decor-circle decor-1"></div>
+    <div class="decor-circle decor-2"></div>
+
+    <!-- Canvas для сердечек -->
+    <canvas id="celebration-canvas"></canvas>
+
+    <!-- Выделенный контейнер для временных стикеров (будет полностью очищен при нажатии "Да") -->
+    <div id="stickers-layer"></div>
+
+    <!-- Основная карточка вопроса -->
+    <div class="card-container" id="invite-card">
+        
+        <!-- Вопрос -->
+        <div id="question-state">
+            <h1 class="title">Menq Helnelu enq che fralu?</h1>
+            
+            <div class="gif-wrapper">
+                <!-- Милая запрашивающая гифка с мишкой/котиком -->
+                <img 
+                    id="main-gif" 
+                    src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Q2NWxyd2h2NW9xOGJ2eW4yaHl2OTdtOXlveHN2dzN6d21ocm56biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/cLS1cfxvGOPVpf9g3y/giphy.gif" 
+                    alt="Cute asking gif"
+                >
+            </div>
+
+            <div class="buttons-group" id="buttons-wrapper">
+                <button class="btn btn-yes" id="btn-yes">ayo</button>
+                <button class="btn btn-no" id="btn-no">voch</button>
+            </div>
+        </div>
+
+        <!-- Радостное сообщение после нажатия "Да" -->
+        <div class="success-screen" id="success-state">
+            <h1 class="success-title">dzeccccccc🥰</h1>
+            
+            <div class="gif-wrapper">
+                <!-- Радостная празднующая гифка -->
+                <img 
+                    id="success-gif" 
+                    src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcG95NDhxOXA4aDJ5Z3RhbjFvOWRkZnQ1eWRwbnRma3l4M2xseDdkMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/T86i6yDyOYz7J6dPhf/giphy.gif" 
+                    alt="Happy celebration gif"
+                >
+            </div>
+            
+            <p class="success-subtitle">Spaseq Padmoshkanerin ✨</p>
+
+            <!-- Праздничные стикеры 10 и 11 -->
+            <div class="final-stickers-row">
+                <img src="sticker10.webp" alt="Sticker 10" class="final-sticker final-sticker-left">
+                <img src="sticker11.webp" alt="Sticker 11" class="final-sticker final-sticker-right">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnNo = document.getElementById('btn-no');
+            const btnYes = document.getElementById('btn-yes');
+            const questionState = document.getElementById('question-state');
+            const successState = document.getElementById('success-state');
+            const canvas = document.getElementById('celebration-canvas');
+
+            let isEscaped = false;
+            let isAgreed = false; // Флаг: если нажали "Да", стикеры больше никогда не спавнятся
+            const stickersLayer = document.getElementById('stickers-layer');
+
+            const stickersList = [
+                'sticker.webp',
+                'sticker2.webp',
+                'sticker3.webp',
+                'sticker4.webp',
+                'sticker5.webp'
+            ];
+
+            let lastStickerTime = 0;
+
+            /**
+             * Добавляет случайный стикер на экран при попытке нажать "Нет"
+             */
+            function spawnRandomSticker() {
+                // Если уже нажали "Да", категорически запрещено создавать новые стикеры!
+                if (isAgreed) return;
+
+                const now = Date.now();
+                // Небольшой троттлинг, чтобы не создавать десятки стикеров за 1 миллисекунду
+                if (now - lastStickerTime < 180) return;
+                lastStickerTime = now;
+
+                const stickerSrc = stickersList[Math.floor(Math.random() * stickersList.length)];
+                
+                const sticker = document.createElement('img');
+                sticker.src = stickerSrc;
+                sticker.className = 'sticker-item';
+                sticker.alt = 'Sticker';
+
+                const winWidth = document.documentElement.clientWidth || window.innerWidth;
+                const winHeight = document.documentElement.clientHeight || window.innerHeight;
+
+                // Случайные координаты (по всей видимой зоне экрана с запасом)
+                const margin = 70;
+                const posX = Math.floor(Math.random() * (winWidth - margin * 2)) + margin;
+                const posY = Math.floor(Math.random() * (winHeight - margin * 2)) + margin;
+
+                // Случайный угол поворота от -25 до +25 градусов
+                const baseRot = Math.floor(Math.random() * 50) - 25;
+                const startRot = baseRot + (Math.floor(Math.random() * 20) - 10);
+                const midRot = baseRot + (Math.floor(Math.random() * 8) - 4);
+
+                sticker.style.left = `${posX}px`;
+                sticker.style.top = `${posY}px`;
+                sticker.style.setProperty('--rot-start', `${startRot}deg`);
+                sticker.style.setProperty('--rot-mid', `${midRot}deg`);
+                sticker.style.setProperty('--rot-end', `${baseRot}deg`);
+
+                if (stickersLayer) {
+                    stickersLayer.appendChild(sticker);
+                } else {
+                    document.body.appendChild(sticker);
+                }
+            }
+
+            /**
+             * Функция бронебойного перемещения кнопки "Нет" СТРОГО в пределах видимости
+             */
+            function teleportNoButton(e) {
+                if (e && e.cancelable) {
+                    e.preventDefault();
+                }
+
+                // При каждой попытке нажать "Нет" выбрасываем стикер на экран!
+                spawnRandomSticker();
+
+                // КРИТИЧЕСКИ ВАЖНО: 
+                // Выносим кнопку напрямую в document.body, чтобы transform и backdrop-filter 
+                // родительской карточки (.card-container) не искажали систему координат fixed-позиционирования!
+                if (!isEscaped) {
+                    // Запоминаем точные физические размеры кнопки
+                    const initialRect = btnNo.getBoundingClientRect();
+                    btnNo.style.width = `${initialRect.width}px`;
+                    btnNo.style.height = `${initialRect.height}px`;
+
+                    document.body.appendChild(btnNo);
+                    btnNo.classList.add('escaped');
+                    isEscaped = true;
+                }
+
+                // Фактические видимые размеры экрана
+                const winWidth = document.documentElement.clientWidth || window.innerWidth;
+                const winHeight = document.documentElement.clientHeight || window.innerHeight;
+
+                const btnWidth = btnNo.offsetWidth || 110;
+                const btnHeight = btnNo.offsetHeight || 50;
+
+                // Солидный безопасный зазор (в пикселях) от всех краёв экрана
+                const padding = 32;
+
+                const minX = padding;
+                const maxX = Math.max(minX, winWidth - btnWidth - padding);
+
+                const minY = padding;
+                const maxY = Math.max(minY, winHeight - btnHeight - padding);
+
+                // Координаты курсора / тача
+                let touchX = null;
+                let touchY = null;
+
+                if (e) {
+                    if (e.touches && e.touches.length > 0) {
+                        touchX = e.touches[0].clientX;
+                        touchY = e.touches[0].clientY;
+                    } else if (e.clientX !== undefined) {
+                        touchX = e.clientX;
+                        touchY = e.clientY;
+                    }
+                }
+
+                let newX, newY;
+                let attempts = 0;
+
+                do {
+                    newX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+                    newY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+                    attempts++;
+
+                    // Стараемся отпрыгнуть от курсора минимум на 110px
+                    if (touchX !== null && touchY !== null) {
+                        const dist = Math.hypot((newX + btnWidth / 2) - touchX, (newY + btnHeight / 2) - touchY);
+                        if (dist > 110 || attempts > 15) break;
+                    } else {
+                        break;
+                    }
+                } while (attempts < 20);
+
+                // Жесткий clamp — кнопка физически не может оказаться за пределами
+                newX = Math.max(minX, Math.min(newX, maxX));
+                newY = Math.max(minY, Math.min(newY, maxY));
+
+                btnNo.style.left = `${Math.round(newX)}px`;
+                btnNo.style.top = `${Math.round(newY)}px`;
+            }
+
+            /**
+             * Проверка и авто-возврат внутрь экрана при ресайзе или повороте экрана
+             */
+            function keepInsideViewport() {
+                if (!isEscaped) return;
+
+                const winWidth = document.documentElement.clientWidth || window.innerWidth;
+                const winHeight = document.documentElement.clientHeight || window.innerHeight;
+                const btnWidth = btnNo.offsetWidth || 110;
+                const btnHeight = btnNo.offsetHeight || 50;
+                const padding = 32;
+
+                const minX = padding;
+                const maxX = Math.max(minX, winWidth - btnWidth - padding);
+                const minY = padding;
+                const maxY = Math.max(minY, winHeight - btnHeight - padding);
+
+                let curX = parseFloat(btnNo.style.left) || minX;
+                let curY = parseFloat(btnNo.style.top) || minY;
+
+                const clampedX = Math.max(minX, Math.min(curX, maxX));
+                const clampedY = Math.max(minY, Math.min(curY, maxY));
+
+                btnNo.style.left = `${Math.round(clampedX)}px`;
+                btnNo.style.top = `${Math.round(clampedY)}px`;
+            }
+
+            // Навешиваем слушатели на все возможные типы взаимодействий
+            btnNo.addEventListener('mouseenter', teleportNoButton);
+            btnNo.addEventListener('mouseover', teleportNoButton);
+            btnNo.addEventListener('touchstart', teleportNoButton, { passive: false });
+            btnNo.addEventListener('pointerenter', teleportNoButton);
+            btnNo.addEventListener('pointerdown', teleportNoButton);
+
+            window.addEventListener('resize', keepInsideViewport);
+            window.addEventListener('orientationchange', keepInsideViewport);
+
+            btnNo.addEventListener('click', (e) => {
+                e.preventDefault();
+                teleportNoButton(e);
+            });
+
+            /**
+             * Обработка нажатия на кнопку "Да"
+             */
+            btnYes.addEventListener('click', () => {
+                // 1. Активируем жесткую блокировку: больше ни один стикер не может появиться
+                isAgreed = true;
+
+                // 2. Полностью удаляем кнопку "Нет" из документа
+                if (btnNo) {
+                    btnNo.style.display = 'none';
+                    if (btnNo.parentNode) {
+                        btnNo.parentNode.removeChild(btnNo);
+                    }
+                }
+
+                // 3. Полностью вычищаем слой стикеров и удаляем все элементы .sticker-item
+                if (stickersLayer) {
+                    stickersLayer.innerHTML = '';
+                }
+                document.querySelectorAll('.sticker-item').forEach(el => el.remove());
+
+                // 4. Переключаемся на финальный экран (где красуются только sticker10 и sticker11)
+                questionState.style.display = 'none';
+                successState.classList.add('active');
+
+                // 5. Запускаем салют из сердечек
+                startHeartsCelebration();
+            });
+
+            /**
+             * Анимация сердечек на Canvas
+             */
+            function startHeartsCelebration() {
+                const ctx = canvas.getContext('2d');
+                let width = (canvas.width = window.innerWidth);
+                let height = (canvas.height = window.innerHeight);
+
+                window.addEventListener('resize', () => {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                });
+
+                const hearts = [];
+                const colors = ['#f43f5e', '#ec4899', '#fb7185', '#fda4af', '#f472b6', '#ff4d6d'];
+
+                // Создаем 65 сердечек
+                for (let i = 0; i < 65; i++) {
+                    hearts.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height - height * 0.5,
+                        size: Math.random() * 12 + 10,
+                        speedY: Math.random() * 2.8 + 1.8,
+                        speedX: Math.random() * 2 - 1,
+                        rotation: Math.random() * 360,
+                        rotationSpeed: Math.random() * 3 - 1.5,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        opacity: Math.random() * 0.7 + 0.3
+                    });
+                }
+
+                function drawHeart(ctx, x, y, size) {
+                    ctx.beginPath();
+                    const topCurveHeight = size * 0.3;
+                    ctx.moveTo(x, y + topCurveHeight);
+                    ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + topCurveHeight);
+                    ctx.bezierCurveTo(x - size / 2, y + (size + topCurveHeight) / 2, x, y + size, x, y + size);
+                    ctx.bezierCurveTo(x, y + size, x + size / 2, y + (size + topCurveHeight) / 2, x + size / 2, y + topCurveHeight);
+                    ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                let frames = 0;
+                function loop() {
+                    ctx.clearRect(0, 0, width, height);
+
+                    hearts.forEach(h => {
+                        h.y += h.speedY;
+                        h.x += Math.sin(h.y * 0.02) * h.speedX;
+                        h.rotation += h.rotationSpeed;
+
+                        ctx.save();
+                        ctx.translate(h.x, h.y);
+                        ctx.rotate((h.rotation * Math.PI) / 180);
+                        ctx.fillStyle = h.color;
+                        ctx.globalAlpha = h.opacity;
+
+                        drawHeart(ctx, 0, 0, h.size);
+                        ctx.restore();
+
+                        if (h.y > height) {
+                            h.y = -30;
+                            h.x = Math.random() * width;
+                        }
+                    });
+
+                    frames++;
+                    if (frames < 450) {
+                        requestAnimationFrame(loop);
+                    } else {
+                        // Постепенное затухание
+                        ctx.clearRect(0, 0, width, height);
+                    }
+                }
+
+                requestAnimationFrame(loop);
+            }
+        });
+    </script>
+</body>
+</html>
+
